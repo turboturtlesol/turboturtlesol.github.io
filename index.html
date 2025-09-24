@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>$TURBO — Turbo Turtle</title>
+  <style>
+    * { box-sizing: border-box }
+    html, body { height: 100%; margin: 0 }
+    body {
+      overflow: hidden; 
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: #fff;
+      background: #0b1022 url('bg-turtle.svg') center/cover no-repeat fixed; 
+      cursor: none; 
+    }
+    .overlay { position: fixed; inset: 0; background: radial-gradient(ellipse at center, rgba(9,11,28,.35), rgba(9,11,28,.55)); }
+
+    .wrap { position: relative; height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; text-align: center; padding: 22px; }
+    .card { max-width: 920px; width: 100%; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(34px, 7.2vw, 78px); font-weight: 900; background: linear-gradient(90deg, #7ef9a7, #33e1b6, #27d1c6, #2fb5f0, #8d6bff); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: .5px; filter: drop-shadow(0 2px 10px rgba(0,0,0,.35)); }
+    .tagline { opacity: .95; font-size: clamp(14px, 2.2vw, 22px); margin-bottom: 18px }
+
+    .ca { display: inline-block; padding: 12px 16px; margin-bottom: 10px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25); border-radius: 12px; backdrop-filter: blur(4px); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace; font-size: clamp(12px, 2.2vw, 18px); }
+    p { max-width: 72ch; margin: 14px auto 0; line-height: 1.6; opacity: .98 }
+
+    /* buttons */
+    .actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center }
+    .btn { padding: 12px 16px; border-radius: 999px; border: none; font-weight: 800; box-shadow: 0 6px 24px rgba(0,0,0,.35); transition: transform .08s ease, box-shadow .12s ease; cursor: none }
+    .btn:active { transform: translateY(1px) scale(.98) }
+    .copy { background:#fff; color:#000 }
+    .pf   { background: #00d18c; color: #0a0f1e }        
+    .ds   { background: #00c2b2; color: #031018 }      
+    .tw   { background: #1d9bf0; color: #001018 }      
+    .btn a { color: inherit; text-decoration: none }
+
+    .foot { position: fixed; bottom: 10px; right: 12px; font-size: 12px; opacity: .7 }
+
+    .cursor { position: fixed; top: 0; left: 0; width: 52px; height: 52px; margin-top: -26px; margin-left: -26px; pointer-events: none; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.6) 40%, rgba(255,255,255,0) 70%), conic-gradient(from 0deg, #ff4d4d, #ffd24d, #4dff88, #4dd2ff, #b64dff, #ff4d4d); mix-blend-mode: screen; filter: blur(1px) saturate(140%); transition: transform .1s ease-out, width .1s ease-out, height .1s ease-out, filter .2s linear; animation: hue 6s linear infinite; z-index: 5; }
+    @keyframes hue { to { filter: hue-rotate(360deg) saturate(140%); } }
+    .cursor.small { width: 36px; height: 36px; margin-top: -18px; margin-left: -18px }
+    .cursor.big   { width: 72px; height: 72px; margin-top: -36px; margin-left: -36px }
+
+    /* wiggle effect on hover */
+    [data-wiggle]:hover { animation: wiggle .25s ease-in-out }
+    @keyframes wiggle { 25%{ transform: rotate(-2deg) } 75%{ transform: rotate(2deg) } }
+
+    @media (max-height: 520px){ .foot{ display:none } }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="wrap">
+    <div class="card">
+      <h1>$TURBO</h1>
+      <div class="tagline">“Turbo Turtle energy. Tongue out, shell up, slow and steady to the moon. 🐢🚀</div>
+
+      <div class="ca" id="ca" data-wiggle>CA: EWGsps6njTCUs4LudUZoc3UosUyXGyBjKLjyMBKbpump</div>
+      <p>
+        Pure meme energy. No roadmap, only vibes. If it moons, genius. If it dips, modern art.
+        Post memes, tag friends, and remember: touching grass is optional, fun is mandatory. 🧠✨
+      </p>
+
+      <div class="actions">
+        <button class="btn copy" id="copy" data-wiggle>Copy CA</button>
+        <button class="btn pf"   data-wiggle>
+          <a id="pump" href="#" target="_blank" rel="noopener">Open on Pump.fun</a>
+        </button>
+        <button class="btn ds"   data-wiggle>
+          <a id="dex"  href="#" target="_blank" rel="noopener">Open on DexScreener</a>
+        </button>
+        <button class="btn tw"   data-wiggle>
+          <a id="tw"   href="#" target="_blank" rel="noopener">Follow on Twitter</a>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="foot">One Page • No scroll • Just Turtles</div>
+
+  <div class="cursor" id="cursor"></div>
+  <script>
+    const CONTRACT_ADDRESS = 'EWGsps6njTCUs4LudUZoc3UosUyXGyBjKLjyMBKbpump'; 
+    const PUMPFUN_URL      = 'https://pump.fun/coin/EWGsps6njTCUs4LudUZoc3UosUyXGyBjKLjyMBKbpump';
+    const DEX_URL          = 'https://dexscreener.com/solana/EWGsps6njTCUs4LudUZoc3UosUyXGyBjKLjyMBKbpump';
+    const TWITTER_URL      = 'https://x.com/turbo_tsol';
+
+    const q = new URLSearchParams(location.search);
+    const caParam = q.get('ca');
+    const pumpParam = q.get('pump');
+    const dexParam = q.get('dex');
+    const twParam = q.get('tw');
+
+    const caText = caParam || CONTRACT_ADDRESS;
+    document.getElementById('ca').textContent = 'CA: ' + caText;
+
+    document.getElementById('pump').href = pumpParam || PUMPFUN_URL.replace('EWGsps6njTCUs4LudUZoc3UosUyXGyBjKLjyMBKbpump', caText);
+    document.getElementById('dex').href  = dexParam  || DEX_URL.replace('EWGsps6njTCUs4LudUZoc3UosUyXGyBjKLjyMBKbpump', caText);
+    document.getElementById('tw').href   = twParam   || TWITTER_URL;
+
+    const btn = document.getElementById('copy');
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(caText).then(() => {
+        const old = btn.textContent; btn.textContent = 'Copied! ✅'; setTimeout(() => btn.textContent = old, 1200);
+      });
+    });
+
+    const c = document.getElementById('cursor');
+    let rafId = null; let targetX = 0, targetY = 0; let x = 0, y = 0;
+    window.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; if (!rafId) tick(); });
+    window.addEventListener('mousedown', () => c.classList.add('big'));
+    window.addEventListener('mouseup',   () => c.classList.remove('big'));
+    function tick(){ x += (targetX - x) * 0.25; y += (targetY - y) * 0.25; c.style.transform = `translate(${x}px, ${y}px)`; rafId = (Math.abs(targetX - x) + Math.abs(targetY - y) > 0.1) ? requestAnimationFrame(tick) : (rafId = null); }
+
+    const shrinkTargets = ['button', 'a', '[data-wiggle]'];
+    document.addEventListener('mouseover', (e) => { if (shrinkTargets.some(sel => e.target.matches?.(sel))) c.classList.add('small'); });
+    document.addEventListener('mouseout', () => c.classList.remove('small'));
+  </script>
+</body>
+</html>
